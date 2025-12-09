@@ -108,7 +108,69 @@ class ERM(Algorithm):
     def predict(self, x):
         return self.network(x)
 
+from torch.utils.checkpoint import checkpoint
+class Jf(Algorithm):
 
+
+    def __init__(self, input_shape, num_classes, num_domains, hparams):
+        super(Jf, self).__init__(input_shape, num_classes, num_domains, hparams)
+        self.featurizer = networks.Featurizer(input_shape, self.hparams)
+        self.classifier = nn.Linear(self.featurizer.n_outputs, num_classes)
+        self.network = nn.Sequential(self.featurizer, self.classifier)
+        self.optimizer = get_optimizer(
+            hparams["optimizer"],
+            self.network.parameters(),
+            lr=self.hparams["lr"],
+            weight_decay=self.hparams["weight_decay"],
+        )
+        
+        # Regularization parameters
+        self.sigma = hparams.get("sigma", 0.1)  # noise standard deviation
+        self.lambd = hparams.get("lambd", 0.0001)  # regularization coefficient
+        self.num_samples = 10  # number of noise samples to average over
+
+    def compute_regularization(self, x):
+
+        with torch.no_grad():s
+            h_x = self.featurizer(x)  # [B, D]
+            g_h_x = self.classifier(h_x)  # [B, C]
+        
+        total_reg = 0.0
+        for _ in range(self.num_samples):
+            eps = torch.randn_like(x) * self.sigma
+            
+
+            g_h_x_eps = checkpoint(self.classifier, h_x_eps)  # [B, C]
+            
+            output_diff = (g_h_x_eps - g_h_x).norm(2, dim=1).pow(2)  # [B]
+
+            total_reg += output_diff
+        
+        return total_reg / (self.num_samples * 2 * self.sigma**2)  # Scalar
+    def update(self, x, y, **kwargs):
+        all_x = torch.cat(x)
+        all_y = torch.cat(y)
+        
+        # Standard ERM loss
+        loss = F.cross_entropy(self.predict(all_x), all_y)
+        
+        # Add regularization
+        reg_loss = self.compute_regularization(all_x)
+        total_loss = loss + self.lambd * reg_loss
+
+        self.optimizer.zero_grad()
+        total_loss.backward()
+        self.optimizer.step()
+
+        return {
+            "loss": loss.item(),
+            "reg_loss": reg_loss.item(),
+            "total_loss": total_loss.item()
+        }
+
+    def predict(self, x):
+        return self.network(x)
+        
 class Mixstyle(Algorithm):
     """MixStyle w/o domain label (random shuffle)"""
 
