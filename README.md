@@ -1,4 +1,5 @@
-# MIRO: Mutual Information Regularization with Oracle (ECCV'22)
+# Towards Better Domain Generalization with
+Jacobian Norm Regularization
 
 Official PyTorch implementation of "Towards Better Domain Generalization with
 Jacobian Norm Regularization"
