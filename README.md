@@ -1,8 +1,9 @@
 # MIRO: Mutual Information Regularization with Oracle (ECCV'22)
 
-Official PyTorch implementation of [Domain Generalization by Mutual-Information Regularization with Pre-trained Models](https://arxiv.org/abs/2203.10789).
+Official PyTorch implementation of "Towards Better Domain Generalization with
+Jacobian Norm Regularization"
 
-Junbum Cha, Kyungjae Lee, Sungrae Park, Sanghyuk Chun.
+Abolfazl (Babak) Ettehadieh, Mostafa Tavassolipour, Hamid Soltanian-Zadeh
 
 <p align="center">
     <img src="./assets/algorithm.png" width="78%" />
