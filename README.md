@@ -178,7 +178,7 @@ Note that this experiments tune $\lambda$ only, so there is room for further per
 ## Citation
 
 ```
-@article{cha2022miro,
+@article{Ett2025JRDG,
   title={Towards Better Domain Generalization with Jacobian Norm Regularization},
   author={Abolfazl Ettehadieh and Mostafa Tavassolipour and Hamid Soltanian-Zadeh},
   journal={ },
