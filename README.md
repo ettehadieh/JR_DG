@@ -6,9 +6,6 @@ Jacobian Norm Regularization"
 
 Abolfazl (Babak) Ettehadieh, Mostafa Tavassolipour, Hamid Soltanian-Zadeh
 
-<p align="center">
-    <img src="./assets/algorithm.png" width="78%" />
-</p>
 
 
 
