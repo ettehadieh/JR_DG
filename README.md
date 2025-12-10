@@ -179,10 +179,10 @@ Note that this experiments tune $\lambda$ only, so there is room for further per
 
 ```
 @article{cha2022miro,
-  title={Domain Generalization by Mutual-Information Regularization with Pre-trained Models},
-  author={Junbum Cha and Kyungjae Lee and Sungrae Park and Sanghyuk Chun},
-  journal={European Conference on Computer Vision (ECCV)},
-  year={2022}
+  title={Towards Better Domain Generalization with Jacobian Norm Regularization},
+  author={Abolfazl Ettehadieh and Mostafa Tavassolipour and Hamid Soltanian-Zadeh},
+  journal={ },
+  year={2025}
 }
 ```
 
