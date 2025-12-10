@@ -43,7 +43,7 @@ Environment:
 `train_all.py` script conducts multiple leave-one-out cross-validations for all target domain.
 
 ```sh
-python train_all.py exp_name --dataset PACS --data_dir /my/dataset/path --algorithm MIRO
+python train_all.py exp_name --dataset PACS --data_dir /my/dataset/path --algorithm Jf --swad True
 ```
 
 
@@ -52,13 +52,14 @@ python train_all.py exp_name --dataset PACS --data_dir /my/dataset/path --algori
 Run command with hyperparameters (HPs):
 
 ```sh
-python train_all.py exp_name --data_dir /my/dataset/path --algorithm MIRO \
+python train_all.py exp_name --data_dir /my/dataset/path --algorithm Jf \
     --dataset PACS \
     --lr 3e-5 \
     --resnet_dropout 0.0 \
     --weight_decay 0.0 \
     --ld 0.01 \
-    --trial_seed 0
+    --trial_seed 0 \
+	--swad True
 ```
 
 Our searched HPs:
