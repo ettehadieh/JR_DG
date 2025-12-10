@@ -110,7 +110,9 @@ class ERM(Algorithm):
 
 from torch.utils.checkpoint import checkpoint
 class Jf(Algorithm):
-
+    """
+    Empirical Risk Minimization (ERM) with added Jf regularization
+    """
 
     def __init__(self, input_shape, num_classes, num_domains, hparams):
         super(Jf, self).__init__(input_shape, num_classes, num_domains, hparams)
@@ -125,13 +127,13 @@ class Jf(Algorithm):
         )
         
         # Regularization parameters
-        self.sigma = hparams.get("sigma", 0.1)  # noise standard deviation
-        self.lambd = hparams.get("lambd", 0.0001)  # regularization coefficient
-        self.num_samples = 10  # number of noise samples to average over
-
+        self.sigma = hparams.get("sigma", 0.05)  # noise standard deviation 0.1
+        self.lambd = hparams.get("lambd", 0.01)  # regularization coefficient, it was 0.000001 and also 0.001
+        self.num_samples = hparams.get("num_samples", 30)  # number of noise samples to average over It was 10
+        # for before it was N=30 lambda=0.001 sigma=0.1
     def compute_regularization(self, x):
-
-        with torch.no_grad():s
+        # Pre-compute original features and outputs
+        with torch.no_grad():  # Avoid storing redundant gradients
             h_x = self.featurizer(x)  # [B, D]
             g_h_x = self.classifier(h_x)  # [B, C]
         
@@ -139,14 +141,17 @@ class Jf(Algorithm):
         for _ in range(self.num_samples):
             eps = torch.randn_like(x) * self.sigma
             
-
+            # Compute perturbed features with checkpointing
+            h_x_eps = checkpoint(self.featurizer, x + eps)  # [B, D]
             g_h_x_eps = checkpoint(self.classifier, h_x_eps)  # [B, C]
             
+            # Per-sample norms (correct scaling)
             output_diff = (g_h_x_eps - g_h_x).norm(2, dim=1).pow(2)  # [B]
 
-            total_reg += output_diff
+            total_reg += (output_diff).mean()  # Scalar
         
-        return total_reg / (self.num_samples * 2 * self.sigma**2)  # Scalar
+        return [total_reg / (self.num_samples * 2 * self.sigma**2),
+                output_diff.mean()/ (self.num_samples * 2 * self.sigma**2)]  # Scalar
     def update(self, x, y, **kwargs):
         all_x = torch.cat(x)
         all_y = torch.cat(y)
@@ -155,7 +160,8 @@ class Jf(Algorithm):
         loss = F.cross_entropy(self.predict(all_x), all_y)
         
         # Add regularization
-        reg_loss = self.compute_regularization(all_x)
+        [reg_loss, Jf] = self.compute_regularization(all_x)
+        Jf = Jf**0.5
         total_loss = loss + self.lambd * reg_loss
 
         self.optimizer.zero_grad()
@@ -164,13 +170,14 @@ class Jf(Algorithm):
 
         return {
             "loss": loss.item(),
+            "Jf":Jf.item(),
             "reg_loss": reg_loss.item(),
             "total_loss": total_loss.item()
         }
 
     def predict(self, x):
         return self.network(x)
-        
+    
 class Mixstyle(Algorithm):
     """MixStyle w/o domain label (random shuffle)"""
 
