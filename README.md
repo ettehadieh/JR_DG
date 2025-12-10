@@ -1,5 +1,4 @@
-# Towards Better Domain Generalization with
-Jacobian Norm Regularization
+# Towards Better Domain Generalization with Jacobian Norm Regularization
 
 Official PyTorch implementation of "Towards Better Domain Generalization with
 Jacobian Norm Regularization"
